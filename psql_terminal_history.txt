@@ -171,3 +171,10 @@ periodic_table->
 periodic_table-> q
 periodic_table-> 
 periodic_table=> 
+
+NEW TERMINAL
+
+UPDATE properties SET atomic_mass = TRIM(TRAILING '0' FROM CAST(atomic_mass AS TEXT))::DECIMAL;
+**This line trimmed all trailing zeroes from a decimal datatype column
+
+
