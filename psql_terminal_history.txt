@@ -1,0 +1,173 @@
+camper: /project$ psql --username=freecodecamp --dbname=periodic_table
+psql (12.17 (Ubuntu 12.17-1.pgdg22.04+1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+Type "help" for help.
+
+periodic_table=> ls
+periodic_table-> /l
+periodic_table-> \l
+                                List of databases
+      Name      |  Owner   | Encoding | Collate |  Ctype  |   Access privileges   
+----------------+----------+----------+---------+---------+-----------------------
+ periodic_table | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+ postgres       | postgres | UTF8     | C.UTF-8 | C.UTF-8 | 
+ template0      | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+                |          |          |         |         | postgres=CTc/postgres
+ template1      | postgres | UTF8     | C.UTF-8 | C.UTF-8 | =c/postgres          +
+                |          |          |         |         | postgres=CTc/postgres
+(4 rows)
+
+periodic_table-> \d
+             List of relations
+ Schema |    Name    | Type  |    Owner     
+--------+------------+-------+--------------
+ public | elements   | table | freecodecamp
+ public | properties | table | freecodecamp
+(2 rows)
+
+periodic_table-> \d elements
+                        Table "public.elements"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ atomic_number | integer               |           | not null | 
+ symbol        | character varying(2)  |           |          | 
+ name          | character varying(40) |           |          | 
+Indexes:
+    "elements_pkey" PRIMARY KEY, btree (atomic_number)
+    "elements_atomic_number_key" UNIQUE CONSTRAINT, btree (atomic_number)
+
+periodic_table-> \d properties
+                       Table "public.properties"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ atomic_number | integer               |           | not null | 
+ type          | character varying(30) |           |          | 
+ weight        | numeric(9,6)          |           | not null | 
+ melting_point | numeric               |           |          | 
+ boiling_point | numeric               |           |          | 
+Indexes:
+    "properties_pkey" PRIMARY KEY, btree (atomic_number)
+    "properties_atomic_number_key" UNIQUE CONSTRAINT, btree (atomic_number)
+
+periodic_table-> SELECT * FROM properties;
+ERROR:  syntax error at or near "ls"
+LINE 1: ls
+        ^
+periodic_table=> 
+periodic_table=> ;
+periodic_table=> ;
+periodic_table=> SELECT
+periodic_table-> ;
+--
+(1 row)
+
+periodic_table=> SELECT * FROM properties;
+ atomic_number |   type    |  weight   | melting_point | boiling_point 
+---------------+-----------+-----------+---------------+---------------
+             1 | nonmetal  |  1.008000 |        -259.1 |        -252.9
+             2 | nonmetal  |  4.002600 |        -272.2 |          -269
+             3 | metal     |  6.940000 |        180.54 |          1342
+             4 | metal     |  9.012200 |          1287 |          2470
+             5 | metalloid | 10.810000 |          2075 |          4000
+             6 | nonmetal  | 12.011000 |          3550 |          4027
+             7 | nonmetal  | 14.007000 |        -210.1 |        -195.8
+             8 | nonmetal  | 15.999000 |          -218 |          -183
+          1000 | metalloid |  1.000000 |            10 |           100
+(9 rows)
+
+periodic_table=> ALTER TABLE properties RENAME COLUMN weight TO atomic_mass;
+ALTER TABLE
+periodic_table=> SELECT * FROM properties;
+ atomic_number |   type    | atomic_mass | melting_point | boiling_point 
+---------------+-----------+-------------+---------------+---------------
+             1 | nonmetal  |    1.008000 |        -259.1 |        -252.9
+             2 | nonmetal  |    4.002600 |        -272.2 |          -269
+             3 | metal     |    6.940000 |        180.54 |          1342
+             4 | metal     |    9.012200 |          1287 |          2470
+             5 | metalloid |   10.810000 |          2075 |          4000
+             6 | nonmetal  |   12.011000 |          3550 |          4027
+             7 | nonmetal  |   14.007000 |        -210.1 |        -195.8
+             8 | nonmetal  |   15.999000 |          -218 |          -183
+          1000 | metalloid |    1.000000 |            10 |           100
+(9 rows)
+
+periodic_table=> ALTER TABLE properties RENAME COLUMN melting_point TO melting_point_celsius;
+ALTER TABLE
+periodic_table=> SELECT * FROM properties;
+ atomic_number |   type    | atomic_mass | melting_point_celsius | boiling_point 
+---------------+-----------+-------------+-----------------------+---------------
+             1 | nonmetal  |    1.008000 |                -259.1 |        -252.9
+             2 | nonmetal  |    4.002600 |                -272.2 |          -269
+             3 | metal     |    6.940000 |                180.54 |          1342
+             4 | metal     |    9.012200 |                  1287 |          2470
+             5 | metalloid |   10.810000 |                  2075 |          4000
+             6 | nonmetal  |   12.011000 |                  3550 |          4027
+             7 | nonmetal  |   14.007000 |                -210.1 |        -195.8
+             8 | nonmetal  |   15.999000 |                  -218 |          -183
+          1000 | metalloid |    1.000000 |                    10 |           100
+(9 rows)
+
+periodic_table=> ALTER TABLE properties RENAME COLUMN boiling_point TO boiling_point_celsius;
+ALTER TABLE
+periodic_table=> ALTER TABLE properties ALTER COLUMN melting_point_celsius SET NOT NULL;
+ALTER TABLE
+periodic_table=> ALTER TABLE properties ALTER COLUMN boiling_point_celsius SET NOT NULL;
+ALTER TABLE
+periodic_table=> ALTER TABLE elements ALTER COLUMN symbol SET UNIQUE;
+ERROR:  syntax error at or near "UNIQUE"
+LINE 1: ALTER TABLE elements ALTER COLUMN symbol SET UNIQUE;
+                                                     ^
+periodic_table=> ALTER TABLE elements ADD UNIQUE (symbol);
+ALTER TABLE
+periodic_table=> ALTER TABLE elements ADD UNIQUE (name);
+ALTER TABLE
+periodic_table=> ALTER TABLE elements ALTER COLUMN symbol SET NOT NULL;
+ALTER TABLE
+periodic_table=> ALTER TABLE elements ALTER COLUMN name SET NOT NULL;
+ALTER TABLE
+periodic_table=> ALTER TABLE properties ADD CONSTRAINT fk_atomic_num FOREIGN KEY (atomic_number) REFERENCES elements(atomic_number);
+ALTER TABLE
+periodic_table=> CREATE TABLE types (type_id INTEGER PRIMARY KEY, type VARCHAR(20) NOT NULL);
+CREATE TABLE
+periodic_table=> SELECT * FROM properties;
+ atomic_number |   type    | atomic_mass | melting_point_celsius | boiling_point_celsius 
+---------------+-----------+-------------+-----------------------+-----------------------
+             1 | nonmetal  |    1.008000 |                -259.1 |                -252.9
+             2 | nonmetal  |    4.002600 |                -272.2 |                  -269
+             3 | metal     |    6.940000 |                180.54 |                  1342
+             4 | metal     |    9.012200 |                  1287 |                  2470
+             5 | metalloid |   10.810000 |                  2075 |                  4000
+             6 | nonmetal  |   12.011000 |                  3550 |                  4027
+             7 | nonmetal  |   14.007000 |                -210.1 |                -195.8
+             8 | nonmetal  |   15.999000 |                  -218 |                  -183
+          1000 | metalloid |    1.000000 |                    10 |                   100
+(9 rows)
+
+periodic_table=> INSERT INTO types(type_id, type) VALUES(1, 'nonmetal'),(2, 'metal'),(3, 'metalloid');
+INSERT 0 3
+periodic_table=> ALTER TABLE properties ADD COLUMN type_id INT NOT NULL CONSTRAINT fk_type_id REFERENCES types(type_id);
+ERROR:  column "type_id" contains null values
+periodic_table=> ALTER TABLE properties ADD COLUMN type_id INT NOT NULL;
+ERROR:  column "type_id" contains null values
+periodic_table=> ALTER TABLE properties ADD COLUMN type_id INT;
+ALTER TABLE
+periodic_table=> UPDATE properties SET type_id = 1 WHERE type = nonmetal;
+ERROR:  column "nonmetal" does not exist
+LINE 1: UPDATE properties SET type_id = 1 WHERE type = nonmetal;
+                                                       ^
+periodic_table=> UPDATE properties SET type_id = 1 WHERE type = 'nonmetal';
+UPDATE 5
+periodic_table=> UPDATE properties SET type_id = 2 WHERE type = 'metal';
+UPDATE 2
+periodic_table=> UPDATE properties SET type_id = 3 WHERE type = 'metalloid';
+UPDATE 2
+periodic_table=> ALTER TABLE properties ALTER COLUMN type_id SET NOT NULL;
+ALTER TABLE
+periodic_table=> ALTER TABLE properties ADD CONSTRAINT fk_type_id FOREIGN KEY (type_id) REFERENCES types(type_id);
+ALTER TABLE
+periodic_table=> pg_dump -cC --inserts -U freecodecamp periodic_table > periodic_table.sql
+periodic_table=> history > history_for_print.txt
+periodic_table-> 
+periodic_table-> q
+periodic_table-> 
+periodic_table=> 
